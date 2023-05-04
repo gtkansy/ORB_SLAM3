@@ -8,13 +8,13 @@
             "name": "Debug ORB-SLAM3",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/Examples/Stereo/stereo_euroc",
+            "program": "${workspaceFolder}/Examples/Monocular/mono_tum_vi",
             "args": [
                 "${workspaceFolder}/Vocabulary/ORBvoc.txt",
-                "${workspaceFolder}/Examples/Stereo/EuRoC.yaml",
-                "/home/leon/dataset/MH_04_difficult",
-                "${workspaceFolder}/Examples/Stereo/EuRoC_TimeStamps/MH04.txt",
-                "dataset-MH04_stereo"
+                "${workspaceFolder}/Examples/Monocular/TUM-VI.yaml",
+                "/home/leon/dataset/dataset-room1_512_16/mav0/cam0/data",
+                "${workspaceFolder}/Examples/Monocular/TUM_TimeStamps/dataset-room1_512.txt",
+                "dataset-room1_512_mono"
             ],
             "stopAtEntry": false,
             //"cwd"属性用于设置调试器的当前工作目录
