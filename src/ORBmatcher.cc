@@ -220,12 +220,19 @@ namespace ORB_SLAM3
             return 4.0;
     }
 
+    /**
+     * param pKF  关键帧
+     * param F    当前普通帧
+     * param vpMapPointMatches F中地图点对应的匹配，NULL表示未匹配
+     * return     成功匹配的数量
+     */
     int ORBmatcher::SearchByBoW(KeyFrame* pKF,Frame &F, vector<MapPoint*> &vpMapPointMatches)
     {
+        // 获取关键帧的地图点
         const vector<MapPoint*> vpMapPointsKF = pKF->GetMapPointMatches();
 
         vpMapPointMatches = vector<MapPoint*>(F.N,static_cast<MapPoint*>(NULL));
-
+        // 取出关键帧的词袋特征向量
         const DBoW2::FeatureVector &vFeatVecKF = pKF->mFeatVec;
 
         int nmatches=0;
@@ -233,7 +240,7 @@ namespace ORB_SLAM3
         vector<int> rotHist[HISTO_LENGTH];
         for(int i=0;i<HISTO_LENGTH;i++)
             rotHist[i].reserve(500);
-        const float factor = 1.0f/HISTO_LENGTH;
+        const float factor = 1.0f / HISTO_LENGTH; // error: HISTO_LENGTH/360.f
 
         // We perform the matching over ORB that belong to the same vocabulary node (at a certain level)
         DBoW2::FeatureVector::const_iterator KFit = vFeatVecKF.begin();
@@ -245,12 +252,13 @@ namespace ORB_SLAM3
         {
             if(KFit->first == Fit->first)
             {
+                // second 存储的是该节点内所有的特征点在原图像中的索引集合
                 const vector<unsigned int> vIndicesKF = KFit->second;
                 const vector<unsigned int> vIndicesF = Fit->second;
 
                 for(size_t iKF=0; iKF<vIndicesKF.size(); iKF++)
                 {
-                    const unsigned int realIdxKF = vIndicesKF[iKF];
+                    const unsigned int realIdxKF = vIndicesKF[iKF];// 该节点中特征点的索引
 
                     MapPoint* pMP = vpMapPointsKF[realIdxKF];
 
@@ -260,11 +268,11 @@ namespace ORB_SLAM3
                     if(pMP->isBad())
                         continue;
 
-                    const cv::Mat &dKF= pKF->mDescriptors.row(realIdxKF);
+                    const cv::Mat &dKF= pKF->mDescriptors.row(realIdxKF);//取出KF中该特征点对应的描述子
 
-                    int bestDist1=256;
-                    int bestIdxF =-1 ;
-                    int bestDist2=256;
+                    int bestDist1=256;  // 最好的距离（最小距离）
+                    int bestIdxF =-1 ;  // 最好距离对应的索引值
+                    int bestDist2=256;   // 次好距离（第二小距离）
 
                     int bestDist1R=256;
                     int bestIdxFR =-1 ;
@@ -275,7 +283,7 @@ namespace ORB_SLAM3
                         if(F.Nleft == -1){
                             const unsigned int realIdxF = vIndicesF[iF];
 
-                            if(vpMapPointMatches[realIdxF])
+                            if(vpMapPointMatches[realIdxF]) //地图点存在表示已经匹配过了，直接跳过
                                 continue;
 
                             const cv::Mat &dF = F.mDescriptors.row(realIdxF);
